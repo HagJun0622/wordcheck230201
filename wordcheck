@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Word Counts</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <table id="word-counts">
+      <tr>
+        <th>Select</th>
+        <th>Word</th>
+        <th>Count</th>
+      </tr>
+    </table>
+    <input type="submit" value="Submit" onclick="submitForm()">
+    <script>
+      function submitForm() {
+        const selectedWords = [];
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        for (const checkbox of checkboxes) {
+          selectedWords.push(checkbox.value);
+        }
+        alert('Selected Words: ' + selectedWords.join(', '));
+      }
+
+      // Load the contents of the word_counts.txt file
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'word_counts.txt', true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+          // Parse the contents of the word_counts.txt file
+          const lines = xhr.responseText.split('\n');
+          const wordCounts = {};
+          for (const line of lines) {
+            const parts = line.split(': ');
+            if (parts.length === 2) {
+              wordCounts[parts[0]] = parseInt(parts[1], 10);
+            }
+          }
+
+          // Display the contents of the word_counts file in the table
+          const table = document.getElementById('word-counts');
+          for (const word of Object.keys(wordCounts).sort()) {
+            const row = table.insertRow();
+            const checkboxCell = row.insertCell();
+            checkboxCell.innerHTML = '<input type="checkbox" value="' + word + '">';
+            const wordCell = row.insertCell();
+            wordCell.innerHTML = word;
+            const countCell = row.insertCell();
+            countCell.innerHTML = wordCounts[word];
+          }
+        }
+      };
+      xhr.send();
+    </script>
+  </body>
+</html>
